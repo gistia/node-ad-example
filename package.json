@@ -1,0 +1,15 @@
+{
+  "name": "node-ad",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "activedirectory": "^0.7.2",
+    "dotenv": "^2.0.0"
+  }
+}
