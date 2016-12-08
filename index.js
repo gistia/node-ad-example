@@ -31,3 +31,24 @@ ad.authenticate(process.argv[2], process.argv[3], (err, auth) => {
 
   displayAuth(auth);
 });
+
+ad.isUserMemberOf(process.argv[2], 'MetaBase_Admin', (err, member) => {
+  if (err) {
+    console.log('Error', err);
+    return;
+  }
+
+  console.log('member?', member);
+});
+
+ad.getGroupMembershipForUser(process.argv[2], (err, groups) => {
+  if (err) {
+    console.log('Error', err);
+    return;
+  }
+
+  console.log('User groups:');
+  groups.forEach(g => {
+    console.log(`  - ${g.cn}`);
+  });
+});
