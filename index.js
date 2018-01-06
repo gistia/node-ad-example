@@ -1,5 +1,7 @@
+const program = require('commander');
 const ActiveDirectory = require('activedirectory');
 const dotenv = require('dotenv');
+const safeEval = require('gistia-safe-eval');
 
 dotenv.config();
 
@@ -8,47 +10,40 @@ const config = {
   baseDN: process.env.LDAP_BASE_DN,
   username: process.env.LDAP_USERNAME,
   password: process.env.LDAP_PASSWORD,
+  userFormatter: process.env.LDAP_BIND_TRANSFORM
+    && ((user) => safeEval(process.env.LDAP_BIND_TRANSFORM, { user })),
 };
 const ad = new ActiveDirectory(config);
 
-function displayAuth(auth, err) {
-  if (auth) {
-    console.log('Authenticated!');
-  } else {
-    if ((err + '').indexOf('InvalidCredentialsError') > -1) {
-      console.log('Invalid credentials');
-    } else {
-      console.log('Auth failed', err);
-    }
-  }
-}
+program
+  .version('0.1.0')
+  .description('Gistia Way CLI');
 
-ad.authenticate(process.argv[2], process.argv[3], (err, auth) => {
-  if (err) {
-    displayAuth(false, err);
-    return;
-  }
+program
+  .command('auth <username> <password>')
+  .alias('a')
+  .description('authenticate user')
+  .action((user, password) => {
+    ad.authenticate(user, password, (err, auth) => {
+      if (err) {
+        return console.log('Auth failed', err);
+      }
 
-  displayAuth(auth);
-});
-
-ad.isUserMemberOf(process.argv[2], 'MetaBase_Admin', (err, member) => {
-  if (err) {
-    console.log('Error', err);
-    return;
-  }
-
-  console.log('member?', member);
-});
-
-ad.getGroupMembershipForUser(process.argv[2], (err, groups) => {
-  if (err) {
-    console.log('Error', err);
-    return;
-  }
-
-  console.log('User groups:');
-  groups.forEach(g => {
-    console.log(`  - ${g.cn}`);
+      console.log('Authenticated');
+    });
   });
-});
+
+program
+  .command('groups <username>')
+  .alias('g')
+  .description('list groups for user')
+  .action(user => {
+    ad.getGroupMembershipForUser(user, (err, groups) => {
+      if (err) { return console.log(err); }
+      if (!groups || !groups.length) { return console.log('No groups'); }
+
+      console.log(groups);
+    })
+  })
+
+program.parse(process.argv);

@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "activedirectory": "^0.7.2",
-    "dotenv": "^2.0.0"
+    "activedirectory": "https://github.com/gistia/node-activedirectory.git",
+    "commander": "2.12.2",
+    "dotenv": "^2.0.0",
+    "gistia-safe-eval": "http://github.com/gistia/safe-eval.git"
   }
 }
